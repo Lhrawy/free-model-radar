@@ -1,1 +1,114 @@
+name: Daily Free Model Scan
 
+# 自包含版本：扫描逻辑内联在 run 步骤里，不依赖 scripts/scan_cloud.py。
+# UTC 23:47 = 北京时间次日 07:47，给本机 08:00 的名单任务留 13 分钟余量。
+# push 触发让首次提交立刻生成报告；paths-ignore 防止机器人自己的提交无限循环。
+on:
+  schedule:
+    - cron: '47 23 * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'report/**'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-free-model-scan
+  cancel-in-progress: true
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Scan and commit report
+        run: |
+          mkdir -p report
+          python - <<'PY' > report/freetoken-bots.json
+          import datetime as dt
+          import json
+          import sys
+          import urllib.request
+
+          API = 'https://openrouter.ai/api/v1/models'
+
+          def zero(v):
+              try:
+                  return float(v) == 0
+              except (TypeError, ValueError):
+                  return False
+
+          def is_free(m):
+              p = m.get('pricing') or {}
+              if not (zero(p.get('prompt')) and zero(p.get('completion'))):
+                  return False
+              return all(zero(p[k]) for k in ('request', 'input_cache_read', 'input_cache_write') if k in p)
+
+          with urllib.request.urlopen(API, timeout=30) as r:
+              catalog = json.load(r).get('data', [])
+          if not catalog:
+              raise RuntimeError('empty /models response')
+
+          free, excluded = [], []
+          for m in sorted(catalog, key=lambda x: x.get('id', '')):
+              if not is_free(m):
+                  continue
+              arch = m.get('architecture') or {}
+              inp = arch.get('input_modalities') or []
+              out = arch.get('output_modalities') or []
+              sp = m.get('supported_parameters') or []
+              mid = m['id']
+              e = {
+                  'id': mid,
+                  'name': m.get('name'),
+                  'context_length': m.get('context_length'),
+                  'tools': 'tools' in sp,
+                  'input_modalities': inp,
+                  'output_modalities': out,
+                  'has_free_suffix': mid.endswith(':free'),
+                  'can_generate_image': 'image' in out,
+                  'can_generate_audio': 'audio' in out,
+                  'description': (m.get('description') or '')[:300].replace('\n', ' '),
+                  'pricing': m.get('pricing') or {},
+              }
+              # Zero prompt/completion prices do not mean the whole product is free:
+              # non-text generators are often billed per clip / per song / per image.
+              if out != ['text'] and not mid.endswith(':free'):
+                  e['excluded_reason'] = '非文本输出且无 :free 后缀，可能按片段/按首/按张计费，pricing 字段无法反映'
+                  excluded.append(e)
+              else:
+                  free.append(e)
+
+          report = {
+              'schema_version': 1,
+              'checked_at': dt.datetime.now(dt.timezone.utc).isoformat(),
+              'source': API,
+              'raw_zero_priced_count': len(free) + len(excluded),
+              'free_count': len(free),
+              'free_ids': [e['id'] for e in free],
+              'free_models': free,
+              'excluded': excluded,
+              'image_output_models': [e['id'] for e in free if e['can_generate_image']],
+              'audio_output_models': [e['id'] for e in free if e['can_generate_audio']],
+              'notes': [
+                  '参数量只认独立验证；description 里的数字只是厂商描述。',
+                  '免费资格是动态的，名单每天 UTC 23:47（北京次日 07:47）刷新。',
+                  'OpenRouter 免费档 50 请求/天、20 请求/分钟（累计充值 >=10 USD 后为 1000/天）。',
+              ],
+          }
+          json.dump(report, sys.stdout, indent=2, ensure_ascii=False)
+          sys.stdout.write('\n')
+          PY
+          python -c "import json;d=json.load(open('report/freetoken-bots.json'));print('free_count=',d['free_count'],'excluded=',len(d['excluded']))"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add report/freetoken-bots.json
+          git commit -m "chore: daily free model scan $(date -u +%Y-%m-%dT%H:%MZ)" || echo "no change"
+          git push
