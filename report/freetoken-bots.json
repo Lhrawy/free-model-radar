@@ -1,12 +1,11 @@
 {
   "schema_version": 1,
-  "checked_at": "2026-11-19T04:30:40.989591+00:00",
+  "checked_at": "2026-11-20T04:18:09.405286+00:00",
   "source": "https://openrouter.ai/api/v1/models",
-  "raw_zero_priced_count": 17,
-  "free_count": 15,
+  "raw_zero_priced_count": 15,
+  "free_count": 13,
   "free_ids": [
     "baidu/ernie-5.5-flash-preview:free",
-    "cohere/north-mini-code:free",
     "dots-studio/dots-3-note-preview:free",
     "google/gemma-4-26b-a4b-it:free",
     "google/gemma-4-31b-it:free",
@@ -18,8 +17,7 @@
     "nvidia/nemotron-3.5-super-vl:free",
     "openrouter/free",
     "particle-ai/particle-1:free",
-    "recursive/flint-v1.0:free",
-    "thinkingmachines/inkling-2-small:free"
+    "recursive/flint-v1.0:free"
   ],
   "free_models": [
     {
@@ -37,26 +35,6 @@
       "can_generate_image": false,
       "can_generate_audio": false,
       "description": "ERNIE 5.5 Flash Preview is the latest foundation model in the ERNIE family, with comprehensive improvements in coding, agentic capabilities, knowledge work, and deep research. It has 280 billion total...",
-      "pricing": {
-        "prompt": "0",
-        "completion": "0"
-      }
-    },
-    {
-      "id": "cohere/north-mini-code:free",
-      "name": "Cohere: North Mini Code (free)",
-      "context_length": 256000,
-      "tools": true,
-      "input_modalities": [
-        "text"
-      ],
-      "output_modalities": [
-        "text"
-      ],
-      "has_free_suffix": true,
-      "can_generate_image": false,
-      "can_generate_audio": false,
-      "description": "North Mini Code is Cohere's first agentic coding model and the debut of its North family. A sparse mixture-of-experts model with 30B total parameters and 3B active, it is optimized...",
       "pricing": {
         "prompt": "0",
         "completion": "0"
@@ -310,27 +288,6 @@
       "can_generate_image": false,
       "can_generate_audio": false,
       "description": "Flint is an open-weight mixture-of-experts model from Recursive, with about 2.5B active parameters out of 40B total, built by Recursive's autoresearch system Eureka Machine for coding agents. It is suited...",
-      "pricing": {
-        "prompt": "0",
-        "completion": "0"
-      }
-    },
-    {
-      "id": "thinkingmachines/inkling-2-small:free",
-      "name": "Thinking Machines: Inkling 2 Small (free)",
-      "context_length": 1048576,
-      "tools": true,
-      "input_modalities": [
-        "text",
-        "image"
-      ],
-      "output_modalities": [
-        "text"
-      ],
-      "has_free_suffix": true,
-      "can_generate_image": false,
-      "can_generate_audio": false,
-      "description": "Inkling 2 Small is an open-weight multimodal mixture-of-experts reasoning model from Thinking Machines Lab, with 17B active parameters out of 594B total. It is the first model in the second...",
       "pricing": {
         "prompt": "0",
         "completion": "0"
