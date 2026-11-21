@@ -1,12 +1,11 @@
 {
   "schema_version": 1,
-  "checked_at": "2026-11-20T04:18:09.405286+00:00",
+  "checked_at": "2026-11-21T04:17:16.238731+00:00",
   "source": "https://openrouter.ai/api/v1/models",
-  "raw_zero_priced_count": 15,
-  "free_count": 13,
+  "raw_zero_priced_count": 14,
+  "free_count": 12,
   "free_ids": [
     "baidu/ernie-5.5-flash-preview:free",
-    "dots-studio/dots-3-note-preview:free",
     "google/gemma-4-26b-a4b-it:free",
     "google/gemma-4-31b-it:free",
     "inclusionai/ling-3.2-flash:free",
@@ -35,27 +34,6 @@
       "can_generate_image": false,
       "can_generate_audio": false,
       "description": "ERNIE 5.5 Flash Preview is the latest foundation model in the ERNIE family, with comprehensive improvements in coding, agentic capabilities, knowledge work, and deep research. It has 280 billion total...",
-      "pricing": {
-        "prompt": "0",
-        "completion": "0"
-      }
-    },
-    {
-      "id": "dots-studio/dots-3-note-preview:free",
-      "name": "Dots Studio: Dots3-Note Preview (free)",
-      "context_length": 512000,
-      "tools": true,
-      "input_modalities": [
-        "text",
-        "image"
-      ],
-      "output_modalities": [
-        "text"
-      ],
-      "has_free_suffix": true,
-      "can_generate_image": false,
-      "can_generate_audio": false,
-      "description": "Dots3-Note Preview is an open-weight mixture-of-experts model from Dots Studio, with 16B active parameters out of 280B total. It is the lightest model in the Dots 3 family and is...",
       "pricing": {
         "prompt": "0",
         "completion": "0"
